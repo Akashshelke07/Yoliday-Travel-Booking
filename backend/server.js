@@ -11,9 +11,32 @@ connectDB();
 
 const app = express();
 
-// CORS Middleware - MUST come BEFORE routes
+// CORS Middleware - Updated for Vercel
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173'],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:5174',
+            'http://127.0.0.1:5173',
+            'https://yoliday-travel-booking.vercel.app',
+        ];
+        
+        // Allow all Vercel preview deployments
+        if (origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(null, true); // For development, allow all origins
+            // In production, uncomment below:
+            // callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -26,11 +49,15 @@ app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test route
+// Fix favicon 404
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// Health check route
 app.get('/', (req, res) => {
     res.json({ 
         message: "✅ Travel Booking API is running!",
         status: "active",
+        environment: process.env.NODE_ENV || 'development',
         timestamp: new Date().toISOString()
     });
 });
@@ -43,27 +70,40 @@ app.use('/api/destinations', require('./routes/destinationRoutes'));
 // 404 Handler
 app.use((req, res) => {
     res.status(404).json({ 
-        message: `Route ${req.originalUrl} not found` 
+        message: `Route ${req.originalUrl} not found`,
+        availableRoutes: ['/api/auth', '/api/booking', '/api/destinations']
     });
 });
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
     console.error('❌ Error:', err.message);
-    console.error(err.stack);
-    res.status(err.status || 500).json({ 
+    
+    // Don't leak stack traces in production
+    const errorResponse = {
         message: err.message || 'Internal Server Error',
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+        status: err.status || 500
+    };
+    
+    if (process.env.NODE_ENV === 'development') {
+        errorResponse.stack = err.stack;
+    }
+    
+    res.status(err.status || 500).json(errorResponse);
+});
+
+// For Vercel, export the app
+module.exports = app;
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
+        console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🌐 CORS enabled for frontend\n`);
     });
-});
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-    console.log(`🌐 CORS enabled for frontend\n`);
-});
+}
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
