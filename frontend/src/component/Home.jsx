@@ -1,148 +1,220 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; 
-import { RiCompassDiscoverFill } from "react-icons/ri";
+import { RiCompassDiscoverFill, RiShieldStarLine, RiMapPinUserLine, RiCustomerService2Line, RiMailSendLine } from "react-icons/ri";
 import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import './Home.css';
 
 function Home() {
-  return (
-    <div style={{ position: 'relative', textAlign: 'center', fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif` }}>
-      {/* Carousel */}
-      <Carousel autoPlay infiniteLoop showThumbs={false} dynamicHeight={false} interval={5000} transitionTime={1000}>
-        <div>
-          <img
-            src="https://images.pexels.com/photos/1450372/pexels-photo-1450372.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Travel 1"
-            style={{
-              width: '100%',
-              height: '620px',
-              objectFit: 'cover',
-              filter: 'brightness(70%)',
-            }}
-          />
-        </div>
-        <div>
-          <img
-            src="https://images.pexels.com/photos/9470504/pexels-photo-9470504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Travel 2"
-            style={{
-              width: '100%',
-              height: '620px',
-              objectFit: 'cover',
-              filter: 'brightness(70%)',
-            }}
-          />
-        </div>
-        <div>
-          <img
-            src="https://images.pexels.com/photos/3601453/pexels-photo-3601453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Travel 3"
-            style={{
-              width: '100%',
-              height: '620px',
-              objectFit: 'cover',
-              filter: 'brightness(70%)',
-            }}
-          />
-        </div>
-      </Carousel>
+  const features = [
+    {
+      icon: <RiShieldStarLine size={40} className="feature-icon" />,
+      title: "Trusted & Safe",
+      desc: "We ensure your journey is safe, secure, and fully insured. Travel with peace of mind."
+    },
+    {
+      icon: <RiMapPinUserLine size={40} className="feature-icon" />,
+      title: "Handpicked Locations",
+      desc: "Our experts curate the most breathtaking and unique destinations for you."
+    },
+    {
+      icon: <RiCustomerService2Line size={40} className="feature-icon" />,
+      title: "24/7 Support",
+      desc: "Our dedicated team is available round the clock to assist you anywhere, anytime."
+    }
+  ];
 
-      {/* Overlay Content */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          color: 'white',
-          textAlign: 'center',
-          padding: '1rem',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          borderRadius: '10px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)',
-          maxWidth: '90%',
-          width: '100%',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '2.8rem',
-            lineHeight: '1.3',
-            fontWeight: '700',
-            marginBottom: '1.5rem',
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Adventure Traveler",
+      quote: "Yoliday made my dream trip to Bali a reality. Seamless booking and amazing support!",
+      image: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150"
+    },
+    {
+      name: "Michael Chen",
+      role: "Photographer",
+      quote: "The curated destinations are truly hidden gems. I got the best shots of my life.",
+      image: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150"
+    }
+  ];
+
+  return (
+    <div className="home-wrapper">
+      {/* 1. HERO SECTION WITH CAROUSEL */}
+      <section className="hero-section">
+        <Carousel 
+          autoPlay 
+          infiniteLoop 
+          showThumbs={false} 
+          showStatus={false}
+          showIndicators={true}
+          interval={5000} 
+          transitionTime={1000}
+          className="hero-carousel"
+          stopOnHover={false}
+          swipeable={true}
+          emulateTouch={true}
+          renderIndicator={(onClickHandler, isSelected, index, label) => {
+            const defStyle = {
+              marginLeft: 5,
+              marginRight: 5,
+              cursor: 'pointer',
+              display: 'inline-block',
+              width: '12px',
+              height: '12px',
+              borderRadius: '50%',
+              background: isSelected ? 'white' : 'rgba(255, 255, 255, 0.5)',
+              transition: 'all 0.3s ease',
+              border: '2px solid white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+            };
+            return (
+              <span
+                style={defStyle}
+                onClick={onClickHandler}
+                onKeyDown={onClickHandler}
+                key={index}
+                role="button"
+                tabIndex={0}
+                aria-label={`${label} ${index + 1}`}
+              />
+            );
           }}
         >
-          Explore the World, One Journey at a Time
-        </h1>
-        <p style={{ fontSize: '1.2rem', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-          Welcome to <strong>Yoliday</strong>, your gateway to unforgettable adventures. Whether you're dreaming of sun-soaked beaches, 
-          snow-capped mountains, or bustling city escapes, we’ve got you covered. Embark on a journey tailored to your dreams.
-        </p>
-        <Link to="/Destination" style={{ textDecoration: 'none' }}>
-          <button
-            style={{
-              backgroundColor: '#3498db',
-              color: 'white',
-              padding: '0.8rem 1.5rem',
-              fontSize: '1rem',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              marginBottom: "10px",
-              transition: 'background-color 0.3s ease',
-            }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = '#2980b9')}
-            onMouseOut={(e) => (e.target.style.backgroundColor = '#3498db')}
-          >
-            <RiCompassDiscoverFill />
-            Destination
-          </button>
-        </Link>
-      </div>
+          <div className="hero-slide">
+            <img
+              src="https://images.pexels.com/photos/1450372/pexels-photo-1450372.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080"
+              alt="Tropical Beach Paradise"
+              className="hero-image"
+            />
+          </div>
+          <div className="hero-slide">
+            <img
+              src="https://images.pexels.com/photos/9470504/pexels-photo-9470504.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080"
+              alt="Mountain Adventure"
+              className="hero-image"
+            />
+          </div>
+          <div className="hero-slide">
+            <img
+              src="https://images.pexels.com/photos/3601453/pexels-photo-3601453.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080"
+              alt="Desert Sunset"
+              className="hero-image"
+            />
+          </div>
+        </Carousel>
+        
+        {/* Hero Overlay Content */}
+        <div className="hero-overlay">
+          <div className="hero-content">
+            <h1 className="hero-title animate-fade-in-up">
+              Explore the World, <br />
+              <span className="text-gradient">One Journey at a Time</span>
+            </h1>
+            <p className="hero-description animate-fade-in-up delay-1">
+              Welcome to <strong>Yoliday</strong>. Discover breathtaking destinations, from sun-soaked beaches to snow-capped mountains. Your next adventure awaits.
+            </p>
+            <Link to="/Destination">
+              <button className="hero-btn animate-fade-in-up delay-2">
+                <RiCompassDiscoverFill size={22} />
+                <span>Explore Destinations</span>
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      {/* Media Queries for Responsive Design */}
-      <style>
-        {`
-          @media (max-width: 768px) {
-            h1 {
-              font-size: 2rem;
-            }
+      {/* 2. WHY CHOOSE US */}
+      <section className="section-container">
+        <div className="section-header">
+          <h2 className="section-title-md">Why Choose Yoliday?</h2>
+          <p className="section-subtitle">We make your travel experience unforgettable.</p>
+        </div>
+        <div className="features-grid">
+          {features.map((item, index) => (
+            <div key={index} className="feature-card glass-panel">
+              <div className="icon-wrapper">{item.icon}</div>
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            p {
-              font-size: 1rem;
-            }
+      {/* 3. POPULAR DESTINATIONS PREVIEW */}
+      <section className="section-container bg-soft">
+        <div className="section-header">
+          <h2 className="section-title-md">Popular Destinations</h2>
+          <p className="section-subtitle">Top rated spots by our community.</p>
+        </div>
+        <div className="preview-grid">
+           <div className="preview-card glass-panel">
+             <img src="https://images.pexels.com/photos/2161449/pexels-photo-2161449.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Maldives Ocean View" />
+             <div className="preview-info">
+               <h3>Maldives</h3>
+               <p className="preview-desc">Crystal clear waters & white sand</p>
+               <Link to="/Destination" className="preview-link">View Details →</Link>
+             </div>
+           </div>
+           <div className="preview-card glass-panel">
+             <img src="https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Swiss Alps Mountains" />
+             <div className="preview-info">
+               <h3>Swiss Alps</h3>
+               <p className="preview-desc">Majestic peaks & scenic trails</p>
+               <Link to="/Destination" className="preview-link">View Details →</Link>
+             </div>
+           </div>
+           <div className="preview-card glass-panel">
+             <img src="https://images.pexels.com/photos/532561/pexels-photo-532561.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Kyoto Japan Temple" />
+             <div className="preview-info">
+               <h3>Kyoto, Japan</h3>
+               <p className="preview-desc">Ancient temples & cherry blossoms</p>
+               <Link to="/Destination" className="preview-link">View Details →</Link>
+             </div>
+           </div>
+        </div>
+      </section>
 
-            .carousel img {
-              height: 400px;
-            }
+      {/* 4. TESTIMONIALS */}
+      <section className="section-container">
+        <div className="section-header">
+          <h2 className="section-title-md">What Travelers Say</h2>
+          <p className="section-subtitle">Real experiences from real travelers</p>
+        </div>
+        <div className="testimonials-grid">
+          {testimonials.map((t, i) => (
+            <div key={i} className="testimonial-card glass-panel">
+              <p className="quote">"{t.quote}"</p>
+              <div className="user-profile">
+                <img src={t.image} alt={t.name} />
+                <div>
+                  <h4>{t.name}</h4>
+                  <span>{t.role}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            button {
-              padding: 0.7rem 1.2rem;
-              font-size: 0.9rem;
-            }
-          }
-
-          @media (max-width: 480px) {
-            h1 {
-              font-size: 1.6rem;
-            }
-
-            p {
-              font-size: 0.9rem;
-            }
-
-            .carousel img {
-              height: 350px;
-            }
-
-            button {
-              padding: 0.6rem 1rem;
-              font-size: 0.8rem;
-            }
-          }
-        `}
-      </style>
+      {/* 5. NEWSLETTER */}
+      <section className="newsletter-section">
+        <div className="newsletter-content glass-panel">
+          <RiMailSendLine size={50} className="newsletter-icon" />
+          <h2>Subscribe to our Newsletter</h2>
+          <p>Get the latest travel deals and updates directly to your inbox.</p>
+          <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              required
+              aria-label="Email address"
+            />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ☁️ Light Cloud Palette */
+  --bg-light: #ffffff;
+  --bg-soft: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.85);
+
+  /* 🌈 Soft Gradients */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --aurora-gradient: linear-gradient(to right, #a18cd1 0%, #fbc2eb 100%);
+  --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3));
+
+  /* 🧊 Frosted Glass */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  --hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+  /* 🖋️ Text Colors */
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-accent: #6d28d9;
+  --text-light: #f8fafc;
+
+  /* 📐 Layout & Spacing */
+  --container-width: 1400px;
+  --header-height: 80px;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+
+  /* 🚀 Animations */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  /* Subtle mesh gradient background */
+  background-image:
+    radial-gradient(at 0% 0%, rgba(161, 140, 209, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(251, 194, 235, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(166, 192, 254, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(246, 128, 132, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* 🌀 Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition-fast);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+/* 🧱 Global Utilities */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section-title {
+  font-size: 3rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Full Height Layout */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🧊 Light Glass Panel Utility */
+.glass-panel {
+  background: var(--glass-gradient);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+}
+
+/* ✨ Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}

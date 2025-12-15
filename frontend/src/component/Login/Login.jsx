@@ -1,21 +1,29 @@
 import React, { useState } from 'react';
-import ForgotPassword from '../ForgotPassword/ForgotPassword'; // Import the ForgotPassword component
+import ForgotPassword from '../ForgotPassword/ForgotPassword';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
-
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Login({ setIsLoggedIn }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    // DEBUG: Log login attempt
+    console.log('🔍 Login attempt:', { email, password: '***' });
 
     try {
+      console.log('📡 Sending request to: http://localhost:5000/api/auth/login');
+      
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
@@ -24,29 +32,85 @@ function Login({ setIsLoggedIn }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const token = await response.json();
-      // const data = await response.json();
+      // DEBUG: Log response status
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response status text:', response.statusText);
+      
+      const responseData = await response.json();
+      
+      // DEBUG: Log response data (hide sensitive token)
+      console.log('📥 Response data:', {
+        ...responseData,
+        token: responseData.token ? responseData.token.substring(0, 20) + '...' : 'N/A',
+        user: responseData.user || 'N/A'
+      });
 
       if (response.ok) {
-        console.log('Login successful:', token);
-        // After successful login, save the token
-        localStorage.setItem('authToken', token); // Assuming 'token' is the JWT from your backend
-        // localStorage.setItem('token', data.token); // Save token in local storage
-        setIsLoggedIn(true); // Update state to indicate successful login
-        navigate('/Destination');
-      
+        console.log('✅ Login response OK');
+        
+        if (responseData.token) {
+          // CRITICAL FIX: Clear old tokens FIRST, then set new ones
+          console.log('🗑️ Clearing old tokens...');
+          localStorage.removeItem('token');
+          localStorage.removeItem('authToken');
+          
+          // Set new tokens
+          console.log('💾 Saving new token...');
+          localStorage.setItem('token', responseData.token);
+          localStorage.setItem('authToken', responseData.token);
+          
+          console.log('✅ Token saved to localStorage');
+          console.log('🔑 Token preview:', responseData.token.substring(0, 30) + '...');
+          console.log('🔑 Token length:', responseData.token.length);
+          
+          // Verify token was saved
+          const savedToken = localStorage.getItem('token');
+          console.log('✅ Token verification:', savedToken ? '✅ Token found in storage' : '❌ Token NOT saved!');
+          
+          if (savedToken) {
+            console.log('✅ Setting isLoggedIn to true');
+            setIsLoggedIn(true);
+            console.log('🔄 Navigating to /Destination');
+            navigate('/Destination');
+          } else {
+            console.error('❌ Token save verification failed!');
+            setError('Failed to save authentication token. Please try again.');
+          }
+        } else {
+          console.error('❌ No token in response');
+          setError('Login successful, but no token received from server.');
+        }
       } else {
-        setError(token.message || 'Login failed. Please try again.');
+        console.error('❌ Login failed with status:', response.status);
+        console.error('❌ Error message:', responseData.message);
+        
+        if (response.status === 401) {
+          setError('Invalid email or password. Please try again.');
+        } else if (response.status === 400) {
+          setError(responseData.message || 'Invalid request. Please check your input.');
+        } else {
+          setError(responseData.message || 'Login failed. Please check your credentials.');
+        }
       }
     } catch (err) {
-      console.error('Error during login:', err);
-      setError('Something went wrong. Please try again later.');
+      console.error('💥 Fetch error occurred');
+      console.error('💥 Error type:', err.name);
+      console.error('💥 Error message:', err.message);
+      console.error('💥 Full error:', err);
+      
+      if (err.message === 'Failed to fetch') {
+        setError('Cannot connect to server. Please ensure the backend is running on http://localhost:5000');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+      console.log('🏁 Login attempt finished');
     }
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Google login clicked');
-    // Add Google login logic here
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -54,52 +118,91 @@ function Login({ setIsLoggedIn }) {
       {showForgotPassword ? (
         <ForgotPassword onClose={() => setShowForgotPassword(false)} />
       ) : (
-        <center>
+        <div className="login-card">
           <form onSubmit={handleLogin}>
-            <h2>Login</h2>
-            {error && <p className="error-message">{error}</p>}
-            <label htmlFor="email">E-mail:</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <h2 className="login-title">Welcome Back</h2>
+            {error && (
+              <div 
+                className="error-message" 
+                style={{ 
+                  color: 'red', 
+                  padding: '10px', 
+                  marginBottom: '10px', 
+                  border: '1px solid red', 
+                  borderRadius: '4px',
+                  backgroundColor: '#fee'
+                }}
+              >
+                {error}
+              </div>
+            )}
+            
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                className="form-input"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
 
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">Password</label>
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  className="form-input"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="password-toggle"
+                  disabled={loading}
+                >
+                  {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                </button>
+              </div>
+            </div>
 
             <input
               type="submit"
-              value="Login"
+              value={loading ? "Signing In..." : "Sign In"}
+              className="submit-btn"
+              disabled={loading}
             />
-            <p className="forgot-password">
+
+            <div className="form-footer">
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="forgot-password-link"
+                className="link-btn"
+                disabled={loading}
               >
                 Forgot Password?
               </button>
-            </p>
-            <p>
-              <a
+              <button
                 type="button"
-                href={'/Register'}
-                className="forgot-password-link"
+                onClick={() => navigate('/Register')}
+                className="link-btn"
+                style={{ fontSize: '0.9rem', color: 'var(--color-text-light)' }}
+                disabled={loading}
               >
-                Register Now !
-              </a>
-            </p>
+                Don't have an account? <span style={{ color: 'var(--color-primary)', fontWeight: '600' }}>Register Now</span>
+              </button>
+            </div>
           </form>
-        </center>
+        </div>
       )}
     </div>
   );

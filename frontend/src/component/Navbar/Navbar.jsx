@@ -1,58 +1,81 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 function Navbar({ isLoggedIn, setIsLoggedIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
+    // CRITICAL FIX: Clear ALL tokens from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    
+    // Optional: If you want to clear everything
+    // localStorage.clear();
+    
+    console.log('✅ Logged out successfully - all tokens cleared');
+    console.log('🔍 Token check after logout:', localStorage.getItem('token'));
+    
     setIsLoggedIn(false);
+    setMenuOpen(false);
+    
+    // Redirect to home page after logout
+    navigate('/');
   };
 
   return (
-    <div className="navbar-container">
+    <nav className="navbar-container">
       {/* Logo as a Link */}
-      <Link to="/" className="logo-link">
-        <img
-          src="https://yoliday.in/_next/static/media/yoliday-white-logo.0230a691.png"
-          alt="Logo"
-          className="logo"
-        />
+      <Link to="/" className="logo-link" onClick={() => setMenuOpen(false)}>
+        <span className="logo">Yoliday</span>
       </Link>
 
       {/* Hamburger Menu */}
       <div className="hamburger-menu" onClick={() => setMenuOpen(!menuOpen)}>
-        &#9776;
+        {menuOpen ? <FaTimes /> : <FaBars />}
       </div>
 
       {/* Navigation Links */}
       <ul className={`nav-links ${menuOpen ? 'active' : ''}`}>
-        <Link to="/" className="nav-link">
-          <li>Home</li>
-        </Link>
-        <Link to="/Destination" className="nav-link">
-          <li>Destination</li>
-        </Link>
-        <Link to="/Booking" className="nav-link">
-          <li>Booking</li>
-        </Link>
-        {!isLoggedIn && (
-          <Link to="/Register" className="nav-link">
-            <li>Register</li>
+        <li>
+          <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>
+            Home
           </Link>
-        )}
-        {!isLoggedIn && (
-          <Link to="/Login" className="nav-link">
-            <li>Login</li>
+        </li>
+        <li>
+          <Link to="/Destination" className="nav-link" onClick={() => setMenuOpen(false)}>
+            Destination
           </Link>
-        )}
-        {isLoggedIn && (
-          <li className="nav-link" onClick={handleLogout}>
-            Logout
+        </li>
+        <li>
+          <Link to="/Booking" className="nav-link" onClick={() => setMenuOpen(false)}>
+            Booking
+          </Link>
+        </li>
+        {!isLoggedIn ? (
+          <>
+            <li>
+              <Link to="/Login" className="nav-link" onClick={() => setMenuOpen(false)}>
+                 Login
+              </Link>
+            </li>
+            <li>
+               <Link to="/Register" className="nav-link" onClick={() => setMenuOpen(false)}>
+                 Get Started
+               </Link>
+            </li>
+          </>
+        ) : (
+          <li>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
           </li>
         )}
       </ul>
-    </div>
+    </nav>
   );
 }
 

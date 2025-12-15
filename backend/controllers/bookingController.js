@@ -1,14 +1,5 @@
 const Booking = require('../models/bookingModel');
 
-// const createBooking = async (req, res) => {
-//     const { destination, date, guests } = req.body;
-//     if (!destination || !date || !guests) return res.status(400).json({ message: 'All fields are required' });
-
-//     const booking = await Booking.create({ user: req.user.id, destination, date, guests });
-//     res.status(201).json(booking);
-// };
-// const Booking = require('../models/Booking'); // Adjust the import based on your project structure
-
 const createBooking = async (req, res) => {
     try {
         const {
@@ -22,7 +13,7 @@ const createBooking = async (req, res) => {
         } = req.body;
 
         // Check if all required fields are provided
-        if (!fullname || !contact || !email || (!destination && !customDestination) || !price || !days) {
+        if (!fullname || !contact || !email || !destination || !price || !days) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -35,8 +26,7 @@ const createBooking = async (req, res) => {
             price,
             days,
             totalCost,
-            // Assuming you have a user field from authentication (optional)
-            // user: req.user.id, 
+            user: req.user?._id // Optional: from auth middleware
         });
 
         res.status(201).json({
@@ -45,13 +35,18 @@ const createBooking = async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating booking:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 const getBookings = async (req, res) => {
-    const bookings = await Booking.find({ user: req.user.id });
-    res.json(bookings);
+    try {
+        const bookings = await Booking.find({ user: req.user._id });
+        res.json(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 };
 
 module.exports = { createBooking, getBookings };
